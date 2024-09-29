@@ -48,9 +48,14 @@ just containerized-build [filename]
 
 ## GitHub Action for resume build automation
 
-- [Resume Build CI Pipeline](https://github.com/bamboovir/typst-resume-template/actions/workflows/build-resume.yml)
+- [Resume Build CI Pipeline](https://github.com/rootavish/onepage-resume/actions/workflows/build-resume.yml)
 
 ## Credit
+[**Original Template**](https://github.com/bamboovir/typst-resume-template) If you use my fork, please give credit and all support/donations to the original author whose work I've modified.
+
+[**Cursor AI**](https://cursor.sh/) for the excellent productivity boost.
+
+[**Anthropic AI**](https://www.anthropic.com/) for the Claude 3.5 Sonnet model used for quick edits and the initial port over to Typst.
 
 [**Typst**](https://github.com/typst/typst) is a new markup-based typesetting system that is designed to be as powerful as LaTeX while being much easier to learn and use.
 
