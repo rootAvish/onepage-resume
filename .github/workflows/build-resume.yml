@@ -1,17 +1,40 @@
----
+name: Build and Release Resume
+
 on:
   push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
     paths:
       - '*.typ'
       - '!template.typ'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get the release version from the tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create ${{ env.VERSION }} --draft --verify-tag --title "Resume ${{ env.VERSION }}"
+    outputs:
+      version: ${{ env.VERSION }}
+
   build-resumes:
+    name: Build Resumes
+    needs: ['create-release']
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Find Typst files
         id: find-typst-files
@@ -30,7 +53,22 @@ jobs:
               "$file" "${file%.*}.pdf"
           done
 
-      - name: Upload Resumes
+      - name: Generate SHA256 checksums
+        run: |
+          for pdf in *.pdf; do
+            sha256sum "$pdf" > "${pdf}.sha256"
+          done
+
+      - name: Upload Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${{ needs.create-release.outputs.version }}"
+          for pdf in *.pdf; do
+            gh release upload "$version" "$pdf" "${pdf}.sha256"
+          done
+
+      - name: Upload Resumes as Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: resumes
