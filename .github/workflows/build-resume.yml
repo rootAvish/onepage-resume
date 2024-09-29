@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - '*.typ'
+      - '!template.typ'
   workflow_dispatch:
 
 jobs:
@@ -14,7 +15,7 @@ jobs:
 
       - name: Find Typst files
         id: find-typst-files
-        run: echo "typst_files=$(ls *.typ | tr '\n' ' ')" >> $GITHUB_OUTPUT
+        run: echo "typst_files=$(ls *.typ | grep -v '^template.typ$' | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
       - name: Build resumes
         run: |
