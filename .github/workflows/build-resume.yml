@@ -1,24 +1,36 @@
 ---
 on:
+  push:
+    paths:
+      - '*.typ'
   workflow_dispatch:
 
 jobs:
-  build-resume:
+  build-resumes:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Build resume
+
+      - name: Find Typst files
+        id: find-typst-files
+        run: echo "typst_files=$(ls *.typ | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Build resumes
         run: |
-          docker run --rm -i \
-            --volume ${{ github.workspace }}:/mnt \
-            --workdir "/mnt" \
-            "ghcr.io/typst/typst:latest" \
-            typst \
-            compile \
-            --font-path "./templates/latex/assets/fonts" \
-            resume.typ "resume.pdf"
-      - name: Upload Resume
+          for file in ${{ steps.find-typst-files.outputs.typst_files }}; do
+            docker run --rm -i \
+              --volume ${{ github.workspace }}:/mnt \
+              --workdir "/mnt" \
+              "ghcr.io/typst/typst:latest" \
+              typst \
+              compile \
+              --font-path "./templates/latex/assets/fonts" \
+              "$file" "${file%.*}.pdf"
+          done
+
+      - name: Upload Resumes
         uses: actions/upload-artifact@v3
         with:
+          name: resumes
           path: "*.pdf"
