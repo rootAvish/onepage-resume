@@ -31,19 +31,19 @@ You are free to take my .typ template and modify it to create your own resume. *
 ## Build Resume
 
 ```bash
-just build
+just build [filename]
 ```
 
 ## Interactive Development Resume
 
 ```bash
-just dev
+just dev [filename]
 ```
 
 ## Containerized Build
 
 ```bash
-just containerized-build
+just containerized-build [filename]
 ```
 
 ## GitHub Action for resume build automation
